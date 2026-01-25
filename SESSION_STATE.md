@@ -1,13 +1,7 @@
 # Session State - Behavioral Interview Coach Project
-**Last Updated:** 2025-01-19
-**Purpose:** Track progress on unified interview prep tool
-
----
-
-## Quick Resume Command
-```bash
-cd /Users/arpitvyas/Desktop/ruhi-recruiting-prep && claude
-```
+**Last Updated:** 2025-01-25
+**Version:** 3.0
+**GitHub:** https://github.com/av-writes-code/behavioral-interview-coach
 
 ---
 
@@ -15,100 +9,87 @@ cd /Users/arpitvyas/Desktop/ruhi-recruiting-prep && claude
 `/Users/arpitvyas/Desktop/ruhi-recruiting-prep/`
 
 ## Key Files
-- **MAIN APP:** `behavioral-interview-coach.html` (426KB) - **OPEN THIS**
-- **V1 (backup):** `amazon-interview-coach-ultimate.html` (393KB)
-- **V2 Timeline Viewer:** `v2/timelines/story-timelines-viewer.html` (reference)
-- **Artifacts Package:** `artifacts-import/project-handoff/` (architecture specs)
+- **MAIN APP:** `behavioral-interview-coach.html` (445KB) - **OPEN THIS**
+- **V1 (backup):** `amazon-interview-coach-ultimate.html` (not committed)
+- **.gitignore:** Excludes personal data
+- **README.md:** User documentation
 
 ---
 
-## What Has Been Completed
+## What Has Been Completed ✅
 
-### 1. Unified App Created ✅ (2025-01-19)
+### 1. Unified App Created (2025-01-25)
 - Created `behavioral-interview-coach.html` combining V1 + V2
-- **8 Tabs:** Analyze, Story Web, Timeline, Competency Map, Practice, Q&A Review, Guide, Settings
-- Version 3.0
+- **9 Tabs:** Analyze, Story Web, Timeline, Competency Map, Practice, Q&A Review, Guide, Research, Settings
+- All personal data removed (company-agnostic)
 
-### 2. BYOK API Key System ✅
+### 2. BYOK API Key System
 - Modal appears on first load if no key stored
 - Key stored in localStorage (never sent anywhere except Anthropic API)
 - Settings page allows managing/changing key
 - API status shown in header
+- All 18 API calls properly authenticated
 
-### 3. Timeline Tab ✅
+### 3. Timeline Tab
 - Mermaid.js Gantt chart visualization
 - Auto-generates from Story Web nodes
 - Color-coded STAR sections (Situation, Task, Action, Result)
 - Event details table
 
-### 4. Company-Agnostic Competencies ✅
+### 4. Company-Agnostic Competencies
 - Company presets: Amazon, Google, Meta, Microsoft
 - Custom competency input for any company
 - Saved to localStorage
 - Header subtitle updates based on target company
 
-### 5. Settings Tab ✅
+### 5. Company Research Tab
+- AI-powered company research
+- Returns: interview process, competencies, questions, tips, mental model
+- Can apply researched competencies to settings
+- Save/load/export research results
+
+### 6. Settings Tab
 - API key management
 - Company/competency selection
 - Data export/import (JSON backup)
 - Clear all data option
 
-### 6. Project Files ✅
-- `.gitignore` created
-- `README.md` updated
+### 7. GitHub Repository
+- Public repo: https://github.com/av-writes-code/behavioral-interview-coach
+- Clean of personal data
+- Proper .gitignore
 
 ---
 
-## What's Next To Build
+## Features Working
 
-### Remaining Tasks
-1. Add company research tab with web search
-2. Remove personal stories, create strong sample stories
-3. Test all API features with real key
-4. Push to GitHub
-
-### Technical Details Ready
-- BYOK implementation code designed
-- Claude Web Search API integration designed
-- Timeline generator from story nodes designed
-- Provenance data model extensions designed
-- LLM prompt templates created
-
----
-
-## Design Documents Created (in agent outputs)
-
-### Product Vision
-- MVP scope vs deferred features
-- User flow: Add story → Structure → Visualize → Practice
-- Universal competency tags (not hardcoded to Amazon)
-- Company presets available (Amazon, Google, Meta)
-
-### Company Research Feature
-- Uses Claude's web_search tool ($0.05-0.08 per research)
-- Searches Glassdoor, Levels.fyi, Reddit, company sites
-- Output structure: interview_process, competencies, questions, tips, mental_model
-- User can edit all sections
-
-### Non-Hallucinated Story Building
-- 5 input methods with provenance tracking
-- Extraction → Verification → Structure → Gap Fill → Assembly
-- Color-coded UI: Green (verified), Yellow (needs confirm), Red (missing)
-- Quality score algorithm (0-100)
-- Export blocked until verified
+| Feature | Tab | Status |
+|---------|-----|--------|
+| Story depth analysis | Analyze | ✅ |
+| Story Web builder | Story Web | ✅ |
+| Timeline visualization | Timeline | ✅ |
+| Competency coverage map | Competency Map | ✅ |
+| Practice drills | Practice | ✅ |
+| Q&A review | Q&A Review | ✅ |
+| Interview guide | Guide | ✅ |
+| Company research | Research | ✅ |
+| Settings & data management | Settings | ✅ |
 
 ---
 
-## User Preferences Noted
-- Tool should work for ANY company, not just Amazon
-- Must actually research online (not just use LLM knowledge)
-- Stories must be non-hallucinated (grounded in user facts)
-- User should be able to modify generated content
-- No personal data leaked to GitHub
+## Not Implemented (Future Enhancements)
+
+- Non-hallucinated story building with provenance tracking
+- Quality gates (verify before export)
+- Web search for company research (currently uses LLM knowledge)
+- Voice input for stories
 
 ---
 
-## Resume Checklist
-1. Open terminal: `cd /Users/arpitvyas/Desktop/ruhi-recruiting-prep && claude`
-2. Tell Claude to read this file
-3. Continue with "Create unified app combining V1 and V2"
+## To Use
+
+1. Open `behavioral-interview-coach.html` in browser
+2. Enter Anthropic API key when prompted
+3. (Optional) Go to Research tab to research your target company
+4. Build stories in Story Web tab
+5. Practice with Practice tab
