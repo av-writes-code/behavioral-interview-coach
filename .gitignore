@@ -1,0 +1,40 @@
+# IDE and Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node.js (if any tooling is added later)
+node_modules/
+npm-debug.log*
+
+# Build outputs
+dist/
+build/
+
+# Sensitive files - NEVER commit API keys
+.env
+.env.local
+*.key
+*credentials*
+*secrets*
+
+# Backup files
+*.bak
+*.backup
+*-backup.*
+
+# Personal data (localStorage exports)
+*backup*.json
+interview-coach-backup-*.json
+
+# Old versions (keep for reference but don't commit)
+amazon-interview-coach-ultimate.html
+
+# Artifacts import (development reference only)
+artifacts-import/
