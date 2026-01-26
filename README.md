@@ -11,12 +11,14 @@ A comprehensive, AI-powered interview preparation tool for behavioral interviews
 - **Practice Mode**: Timed practice sessions with AI-generated follow-up questions
 - **Q&A Review**: Analyze your question-answer pairs for strengths and improvements
 - **Competency Map**: Track coverage of competencies across your stories
+- **Company Research**: AI-powered research on company interview processes and competencies
 
 ### AI-Powered Features
 - Story depth analysis and scoring
 - Dynamic follow-up question generation
 - Bar Raiser-style probing questions
 - Suggested response improvements
+- Company interview research (uses Claude's knowledge base)
 
 ### Bring Your Own Key (BYOK)
 This app uses the Claude API for AI features. You'll need your own Anthropic API key:
@@ -43,11 +45,10 @@ Supports multiple company competency frameworks:
 
 ```
 behavioral-interview-coach/
-├── behavioral-interview-coach.html  # Main unified app (open this)
+├── behavioral-interview-coach.html  # Main app (open this)
 ├── README.md                        # This file
-├── .gitignore                       # Git ignore patterns
-└── v2/                              # Reference materials
-    └── timelines/                   # Timeline viewer reference
+├── LICENSE                          # MIT License
+└── .gitignore                       # Git ignore patterns
 ```
 
 ## Usage
@@ -87,10 +88,10 @@ Use the **Settings** tab to export/import data backups.
 
 ## Technical Details
 
-- Single HTML file (~400KB)
+- Single HTML file (~450KB)
 - No server required
-- Uses Claude claude-sonnet-4-5-20250929 model via Anthropic API
-- Mermaid.js for timeline charts
+- Uses Claude API (claude-sonnet-4-5-20250929)
+- Mermaid.js for timeline charts (loaded from CDN)
 - LocalStorage for persistence
 
 ## Privacy
@@ -101,15 +102,11 @@ Use the **Settings** tab to export/import data backups.
 
 ## Browser Support
 
-Works best in modern browsers:
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
+Works in modern browsers (Chrome, Firefox, Safari, Edge). Requires JavaScript enabled.
 
 ## License
 
-MIT License - Feel free to modify and use for your interview prep.
+[MIT License](LICENSE) - Feel free to modify and use for your interview prep.
 
 ---
 
