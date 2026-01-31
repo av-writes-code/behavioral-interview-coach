@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Behavioral Interview Coach</title>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -784,7 +784,7 @@
             <div id="analyzer" class="section active">
                 <div class="intro-box">
                     <h2>📝 Story Depth Analyzer</h2>
-                    <p>Evaluate if your story is "meaty" enough for 40 minutes of follow-up questions. Get depth scoring and improvement suggestions.</p>
+                    <p>Evaluate if your story has sufficient depth for rigorous follow-up questions. Get depth scoring and improvement suggestions.</p>
                     <button class="btn btn-sm btn-secondary" onclick="showStoryManager()" style="margin-top: 10px;">📚 Manage Saved Stories</button>
                 </div>
                 
@@ -1112,14 +1112,9 @@ Key things to include:
                     <div class="input-section">
                         <h3>Deliver Your Response</h3>
                         <div class="timer-display" id="main-timer">
-                            ⏱ <span id="timer-value">00:00</span> / 60s
+                            ⏱ <span id="timer-value">00:00</span> / 60s target
                         </div>
-                        <div class="star-timer-breakdown" id="star-breakdown" style="display: none;">
-                            <div class="star-timer-segment situation">S: <span id="timer-s">0s</span></div>
-                            <div class="star-timer-segment task">T: <span id="timer-t">0s</span></div>
-                            <div class="star-timer-segment action">A: <span id="timer-a">0s</span></div>
-                            <div class="star-timer-segment result">R: <span id="timer-r">0s</span></div>
-                        </div>
+                        <div id="timer-warning" style="color: #e67e22; font-size: 0.85em; text-align: center; min-height: 1.2em; margin-top: 5px;"></div>
 
                         <div class="audio-controls" id="audio-section">
                             <button class="btn btn-danger" id="record-btn" onclick="toggleRecording()">🎤 Start Recording</button>
@@ -1356,11 +1351,11 @@ Key things to include:
                 <div id="timeline-container" style="display: none;">
                     <!-- Color Legend -->
                     <div style="background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin: 20px 0; display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
-                        <span style="font-weight: bold; color: #333;">Color Legend:</span>
-                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #8a8aef;"></div><span>Action</span></div>
-                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #ff6b6b;"></div><span>Challenge/Risk</span></div>
-                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #7bc97b;"></div><span>Result</span></div>
-                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #d4d4d4;"></div><span>Milestone</span></div>
+                        <span style="font-weight: bold; color: #333;">STAR Components:</span>
+                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #A8D5BA;"></div><span>Situation</span></div>
+                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #AED9E0;"></div><span>Task</span></div>
+                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #FFD9A8;"></div><span>Action</span></div>
+                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #F4B4D4;"></div><span>Result</span></div>
                     </div>
 
                     <!-- Mermaid Timeline -->
@@ -1381,7 +1376,7 @@ Key things to include:
             <div id="research" class="section">
                 <div class="intro-box" style="background: linear-gradient(135deg, #11998e15 0%, #38ef7d15 100%); border: 2px solid #11998e;">
                     <h2>🔍 Company Research</h2>
-                    <p>Research your target company using AI-powered web search. Get real interview insights, competencies, and preparation tips.</p>
+                    <p>Research your target company using AI knowledge. Get interview insights, competencies, and preparation tips based on Claude's training data.</p>
                     <p style="font-size: 0.9em; color: #666; margin-top: 10px;">Requires API key. Costs ~$0.05-0.10 per research.</p>
                 </div>
 
@@ -1410,7 +1405,7 @@ Key things to include:
                 <div id="research-loading" style="display: none; text-align: center; padding: 40px;">
                     <div class="loading-spinner"></div>
                     <p style="margin-top: 15px; color: #666;">Researching... This may take 30-60 seconds.</p>
-                    <p style="font-size: 0.85em; color: #999;">Searching Glassdoor, Levels.fyi, company sites, and more...</p>
+                    <p style="font-size: 0.85em; color: #999;">Analyzing using AI knowledge base...</p>
                 </div>
 
                 <div id="research-results" style="display: none;">
@@ -1450,7 +1445,7 @@ Key things to include:
                     <!-- Actions -->
                     <div style="margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                         <button class="btn btn-secondary" onclick="saveResearchResults()">💾 Save to Notes</button>
-                        <button class="btn btn-secondary" onclick="exportResearchResults()">📤 Export as PDF</button>
+                        <button class="btn btn-secondary" onclick="exportResearchResults()">📤 Export as Text</button>
                         <button class="btn btn-secondary" onclick="clearResearchResults()">🗑️ Clear Results</button>
                     </div>
                 </div>
@@ -1568,12 +1563,11 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
         let CURRENT_COMPETENCIES = COMPANY_PRESETS.amazon.competencies;
         let CURRENT_COMPANY = 'Amazon';
 
-        // For backward compatibility, also keep this
-        const LEADERSHIP_PRINCIPLES = [
-            'Dive Deep', 'Ownership', 'Invent & Simplify', 'Learn & Be Curious',
-            'Deliver Results', 'Earn Trust', 'Have Backbone', 'Bias for Action',
-            'Customer Obsession', 'Think Big', 'Frugality', 'Hire & Develop'
-        ];
+        // LEADERSHIP_PRINCIPLES now dynamically references CURRENT_COMPETENCIES
+        // so that company presets (Google, Meta, etc.) are respected throughout the app
+        function getCompetencies() {
+            return CURRENT_COMPETENCIES;
+        }
 
         // ==================== BYOK API KEY MANAGEMENT ====================
         let API_KEY = null;
@@ -1666,37 +1660,75 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
             }
         }
 
-        // Wrapper for all Claude API calls - adds authentication
+        // Wrapper for all Claude API calls - adds authentication, timeout, and retry
         async function callClaudeAPI(messages, maxTokens = 4000, model = 'claude-sonnet-4-5-20250929') {
             const apiKey = getApiKey();
             if (!apiKey) {
                 throw new Error('No API key configured. Go to Settings to add your Anthropic API key.');
             }
 
-            const response = await fetch("https://api.anthropic.com/v1/messages", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "x-api-key": apiKey,
-                    "anthropic-version": "2023-06-01",
-                    "anthropic-dangerous-direct-browser-access": "true"
-                },
-                body: JSON.stringify({
-                    model: model,
-                    max_tokens: maxTokens,
-                    messages: messages
-                })
-            });
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 120000); // 2 minute timeout
 
-            if (!response.ok) {
-                const error = await response.json().catch(() => ({}));
-                if (response.status === 401) {
-                    throw new Error('Invalid API key. Please check your key in Settings.');
+            let lastError;
+            const maxRetries = 2;
+
+            for (let attempt = 0; attempt <= maxRetries; attempt++) {
+                try {
+                    const response = await fetch("https://api.anthropic.com/v1/messages", {
+                        method: "POST",
+                        signal: controller.signal,
+                        headers: {
+                            "Content-Type": "application/json",
+                            "x-api-key": apiKey,
+                            "anthropic-version": "2023-06-01",
+                            "anthropic-dangerous-direct-browser-access": "true"
+                        },
+                        body: JSON.stringify({
+                            model: model,
+                            max_tokens: maxTokens,
+                            messages: messages
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json().catch(() => ({}));
+                        if (response.status === 401) {
+                            clearTimeout(timeoutId);
+                            throw new Error('Invalid API key. Please check your key in Settings.');
+                        }
+                        if (response.status === 429) {
+                            if (attempt < maxRetries) {
+                                const waitMs = (attempt + 1) * 5000; // 5s, 10s backoff
+                                await new Promise(r => setTimeout(r, waitMs));
+                                continue;
+                            }
+                            clearTimeout(timeoutId);
+                            throw new Error('Rate limit exceeded. Please wait a minute and try again.');
+                        }
+                        if (response.status >= 500 && attempt < maxRetries) {
+                            await new Promise(r => setTimeout(r, 3000));
+                            continue;
+                        }
+                        clearTimeout(timeoutId);
+                        throw new Error(error.error?.message || `API error: ${response.status}`);
+                    }
+
+                    clearTimeout(timeoutId);
+                    return await response.json();
+                } catch (err) {
+                    lastError = err;
+                    if (err.name === 'AbortError') {
+                        throw new Error('Request timed out. Please try again.');
+                    }
+                    if (err.message.includes('Invalid API key') || err.message.includes('Rate limit') || err.message.includes('timed out')) {
+                        throw err;
+                    }
+                    if (attempt < maxRetries) continue;
+                    throw err;
                 }
-                throw new Error(error.error?.message || `API error: ${response.status}`);
             }
-
-            return await response.json();
+            throw lastError;
         }
 
         // ==================== COMPANY/COMPETENCY SETTINGS ====================
@@ -1772,7 +1804,18 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
             }
 
             renderCompetenciesList();
+            // Re-populate LP selectors in Practice and Story Web tabs with new competencies
+            repopulateLPSelectors();
             alert(`Settings saved for ${CURRENT_COMPANY}`);
+        }
+
+        // Re-populate competency checkboxes when company changes
+        function repopulateLPSelectors() {
+            const drillLPs = document.getElementById('drill-lp-selection');
+            const eventLPs = document.getElementById('event-lps');
+            if (drillLPs) drillLPs.innerHTML = '';
+            if (eventLPs) eventLPs.innerHTML = '';
+            populateLPSelectors();
         }
 
         async function resetCompanySettings() {
@@ -1796,6 +1839,7 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
             }
 
             renderCompetenciesList();
+            repopulateLPSelectors();
         }
 
         function renderCompetenciesList() {
@@ -1904,7 +1948,7 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
             const container = document.getElementById('timeline-mermaid');
             container.innerHTML = `<pre class="mermaid">${mermaidCode}</pre>`;
 
-            // Initialize Mermaid
+            // Initialize Mermaid (with fallback if CDN failed to load)
             if (window.mermaid) {
                 mermaid.initialize({
                     startOnLoad: true,
@@ -1917,6 +1961,11 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
                     }
                 });
                 mermaid.contentLoaded();
+            } else {
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: #e74c3c; background: #fdf0ef; border-radius: 8px;">' +
+                    '<p><strong>Timeline visualization unavailable.</strong></p>' +
+                    '<p style="font-size: 0.9em; margin-top: 8px;">Mermaid.js library failed to load. Please check your internet connection and refresh the page.</p>' +
+                    '</div>';
             }
         }
 
@@ -2979,7 +3028,7 @@ Respond ONLY with valid JSON:
             const drillLPs = document.getElementById('drill-lp-selection');
             const eventLPs = document.getElementById('event-lps');
             
-            LEADERSHIP_PRINCIPLES.forEach(lp => {
+            getCompetencies().forEach(lp => {
                 const lpClass = lp.toLowerCase().replace(/ /g, '-').replace(/&/g, '').replace(/,/g, '');
                 
                 // Drill selector
@@ -3120,10 +3169,34 @@ CRITICAL INSTRUCTIONS:
                     })
                 });
 
+                if (!response.ok) {
+                    const errBody = await response.json().catch(() => ({}));
+                    if (response.status === 401) throw new Error('Invalid API key. Please check your key in Settings.');
+                    if (response.status === 429) throw new Error('Rate limit exceeded. Please wait a minute and try again.');
+                    throw new Error(errBody.error?.message || `API error: ${response.status}`);
+                }
+
                 const data = await response.json();
+                if (!data.content || !data.content[0] || !data.content[0].text) {
+                    throw new Error('Unexpected API response format.');
+                }
                 const text = data.content[0].text.replace(/```json|```/g, "").trim();
-                const analysis = JSON.parse(text);
-                
+                let analysis;
+                try {
+                    analysis = JSON.parse(text);
+                } catch (parseErr) {
+                    throw new Error('AI returned invalid JSON. Please try again.');
+                }
+
+                // Validate and clamp key fields
+                analysis.meatiness_score = Math.max(0, Math.min(10, parseInt(analysis.meatiness_score) || 0));
+                analysis.overall_feedback = analysis.overall_feedback || 'No feedback provided.';
+                analysis.depth_indicators = analysis.depth_indicators || {};
+                analysis.depth_indicators.metrics_count = parseInt(analysis.depth_indicators.metrics_count) || 0;
+                analysis.depth_indicators.technical_depth = ['high', 'medium', 'low'].includes(analysis.depth_indicators.technical_depth) ? analysis.depth_indicators.technical_depth : 'unknown';
+                analysis.leadership_principles = Array.isArray(analysis.leadership_principles) ? analysis.leadership_principles : [];
+                analysis.follow_up_potential = Array.isArray(analysis.follow_up_potential) ? analysis.follow_up_potential.slice(0, 5) : [];
+
                 // Auto-save the analyzed story with generated web to storage
                 const storyId = 'story_' + Date.now();
                 const stories = await storage.load('stories') || {};
@@ -6557,11 +6630,25 @@ Create 4-8 nodes covering Situation, Task, Actions, and Results.`
             }
 
             const stories = storiesText.split(/---+|\n\n\n/).filter(s => s.trim().length > 100);
+            if (stories.length === 0) {
+                alert('No stories found (each story must be 100+ characters, separated by --- or blank lines).');
+                return;
+            }
+
+            if (!hasApiKey()) {
+                alert('API key required. Go to Settings to add your Anthropic API key.');
+                return;
+            }
+
             const loading = document.getElementById('coverage-loading');
             const results = document.getElementById('coverage-results');
 
             loading.classList.add('show');
             results.classList.remove('show');
+
+            const competenciesList = CURRENT_COMPETENCIES;
+            const exampleComp1 = competenciesList[0] || 'Competency 1';
+            const exampleComp2 = competenciesList[1] || 'Competency 2';
 
             try {
                 const response = await fetch("https://api.anthropic.com/v1/messages", {
@@ -6572,31 +6659,60 @@ Create 4-8 nodes covering Situation, Task, Actions, and Results.`
                         max_tokens: 4000,
                         messages: [{
                             role: "user",
-                            content: `Analyze LP coverage for ${stories.length} ${CURRENT_COMPANY} stories.
+                            content: `Analyze competency coverage for ${stories.length} ${CURRENT_COMPANY} interview stories.
 
-STORIES: ${stories.map((s, i) => `Story ${i+1}: ${s.substring(0, 500)}`).join('\n\n')}
+COMPETENCIES TO EVALUATE (use EXACTLY these names as keys in the coverage_matrix):
+${competenciesList.map(c => `- ${c}`).join('\n')}
 
-Respond with JSON:
+STORIES:
+${stories.map((s, i) => `Story ${i+1}: ${s.substring(0, 500)}`).join('\n\n')}
+
+Rate each story's coverage of EACH competency on a 0-3 scale:
+0 = not demonstrated, 1 = weakly demonstrated, 2 = moderately demonstrated, 3 = strongly demonstrated
+
+Respond ONLY with valid JSON (no markdown, no backticks):
 {
   "coverage_matrix": {
-    "Dive Deep": [2, 0, 3],
-    "Ownership": [3, 2, 1]
+    "${exampleComp1}": [2, 0, 3],
+    "${exampleComp2}": [3, 2, 1]
   },
-  "gaps": ["Need more Backbone stories"],
-  "strongest": ["Deliver Results"],
+  "gaps": ["Need more stories demonstrating X competency"],
+  "strongest": ["Competency name with best coverage"],
   "mece_score": 7
 }`
                         }]
                     })
                 });
 
+                if (!response.ok) {
+                    const errBody = await response.json().catch(() => ({}));
+                    if (response.status === 401) throw new Error('Invalid API key. Please check your key in Settings.');
+                    if (response.status === 429) throw new Error('Rate limit exceeded. Please wait a minute and try again.');
+                    throw new Error(errBody.error?.message || `API error: ${response.status}`);
+                }
+
                 const data = await response.json();
+                if (!data.content || !data.content[0] || !data.content[0].text) {
+                    throw new Error('Unexpected API response format.');
+                }
                 const text = data.content[0].text.replace(/```json|```/g, "").trim();
-                const analysis = JSON.parse(text);
+                let analysis;
+                try {
+                    analysis = JSON.parse(text);
+                } catch (parseErr) {
+                    throw new Error('AI returned invalid JSON. Please try again.');
+                }
+
+                // Validate response
+                analysis.coverage_matrix = analysis.coverage_matrix || {};
+                analysis.gaps = Array.isArray(analysis.gaps) ? analysis.gaps : [];
+                analysis.strongest = Array.isArray(analysis.strongest) ? analysis.strongest : [];
+                analysis.mece_score = Math.max(0, Math.min(10, parseInt(analysis.mece_score) || 0));
+
                 displayCoverageMap(analysis, stories.length);
             } catch (error) {
                 console.error('Error:', error);
-                alert('Error analyzing coverage.');
+                alert('Error analyzing coverage: ' + error.message);
             } finally {
                 loading.classList.remove('show');
             }
@@ -6643,9 +6759,13 @@ Respond with JSON:
 
         // ==================== TAB 4: QUESTION DRILL ====================
         async function startQuestionDrill() {
+            if (!hasApiKey()) {
+                alert('API key required for Practice Mode. Go to Settings to add your Anthropic API key.');
+                return;
+            }
             const selectedLPs = Array.from(document.querySelectorAll('#drill-lp-selection input:checked')).map(cb => cb.value);
             if (selectedLPs.length === 0) {
-                alert('Please select at least one Leadership Principle!');
+                alert('Please select at least one competency!');
                 return;
             }
 
@@ -6807,13 +6927,15 @@ Respond with JSON:
                 const mins = Math.floor(currentTimerSeconds / 60);
                 const secs = currentTimerSeconds % 60;
                 timerValue.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                
-                // Update STAR component timings (simplified - would need manual marking in production)
-                starTimings[currentComponent]++;
-                updateSTARDisplay();
-                
-                if (currentTimerSeconds >= 60) {
+
+                if (currentTimerSeconds === 60) {
                     timerDisplay.classList.add('expired');
+                    // Flash a non-blocking visual warning
+                    const warningEl = document.getElementById('timer-warning');
+                    if (warningEl) warningEl.textContent = 'Target time reached — keep going or wrap up your STAR response.';
+                } else if (currentTimerSeconds === 120) {
+                    const warningEl = document.getElementById('timer-warning');
+                    if (warningEl) warningEl.textContent = 'Over 2 minutes — in real interviews, aim for 60-90 seconds per initial answer.';
                 }
             }, 1000);
         }
@@ -7734,9 +7856,7 @@ Generate ONE bar-raiser follow-up question:`
             audioBlob = null;
         }
 
-        function loadFromQueue() {
-            alert('Review queue feature - load questions due for practice');
-        }
+        // loadFromQueue is implemented below with SpacedRepetitionManager
 
         // ==================== TAB 5: SIMULATOR ====================
         async function startSimulation() {
@@ -8424,6 +8544,17 @@ Respond ONLY with valid JSON (no markdown):
             loading.classList.add('show');
             results.classList.remove('show');
 
+            if (!hasApiKey()) {
+                alert('API key required. Go to Settings to add your Anthropic API key.');
+                loading.classList.remove('show');
+                return;
+            }
+
+            // Gather context for richer analysis
+            const resume = await storage.load('user_resume') || '';
+            const jobPosting = await storage.load('target_job') || '';
+            const competenciesList = CURRENT_COMPETENCIES.join(', ');
+
             try {
                 const response = await fetch("https://api.anthropic.com/v1/messages", {
                     method: "POST",
@@ -8433,21 +8564,31 @@ Respond ONLY with valid JSON (no markdown):
                         max_tokens: 4000,
                         messages: [{
                             role: "user",
-                            content: `Analyze Q&A for ${CURRENT_COMPANY}:
+                            content: `You are an expert behavioral interview coach. Analyze the following Q&A pairs for a ${CURRENT_COMPANY} interview.
 
+EVALUATION FRAMEWORK:
+- Company competencies to evaluate against: ${competenciesList}
+- Use the STAR method (Situation, Task, Action, Result) as the gold standard
+- Score each answer 0-100 based on: specificity, metrics/data, demonstrated competencies, STAR completeness, and depth of insight
+- Strengths should cite specific parts of the answer that work well
+- Suggestions should be actionable (e.g., "Add a specific metric for the outcome" not "Be more specific")
+- Improved answers should demonstrate STAR structure and include concrete details
+${resume ? `\nCANDIDATE RESUME (for context):\n${typeof resume === 'string' ? resume.substring(0, 1000) : ''}\n` : ''}${jobPosting ? `\nTARGET ROLE:\n${typeof jobPosting === 'object' ? (jobPosting.title || '') + ' ' + (jobPosting.description || '').substring(0, 500) : String(jobPosting).substring(0, 500)}\n` : ''}
+Q&A PAIRS:
 ${qaText}
 
-Respond with JSON:
+Respond ONLY with valid JSON (no markdown, no backticks):
 {
   "overall_score": 80,
   "qa_pairs": [
     {
-      "question": "...",
-      "answer": "...",
+      "question": "The original question",
+      "answer": "The original answer",
       "score": 85,
-      "strengths": ["..."],
-      "suggestions": ["..."],
-      "improved_answer": "Here's a stronger version: ..."
+      "competencies_demonstrated": ["Relevant competency 1"],
+      "strengths": ["Specific strength with quote from answer"],
+      "suggestions": ["Actionable improvement suggestion"],
+      "improved_answer": "A stronger STAR-structured version of the answer"
     }
   ]
 }`
@@ -8455,13 +8596,40 @@ Respond with JSON:
                     })
                 });
 
+                if (!response.ok) {
+                    const errBody = await response.json().catch(() => ({}));
+                    if (response.status === 401) throw new Error('Invalid API key. Please check your key in Settings.');
+                    if (response.status === 429) throw new Error('Rate limit exceeded. Please wait a minute and try again.');
+                    throw new Error(errBody.error?.message || `API error: ${response.status}`);
+                }
+
                 const data = await response.json();
+                if (!data.content || !data.content[0] || !data.content[0].text) {
+                    throw new Error('Unexpected API response format.');
+                }
                 const text = data.content[0].text.replace(/```json|```/g, "").trim();
-                const analysis = JSON.parse(text);
+                let analysis;
+                try {
+                    analysis = JSON.parse(text);
+                } catch (parseErr) {
+                    throw new Error('AI returned invalid JSON. Please try again.');
+                }
+
+                // Validate response structure
+                analysis.overall_score = Math.max(0, Math.min(100, parseInt(analysis.overall_score) || 0));
+                analysis.qa_pairs = Array.isArray(analysis.qa_pairs) ? analysis.qa_pairs.map(pair => ({
+                    question: pair.question || 'Unknown question',
+                    answer: pair.answer || 'No answer provided',
+                    score: Math.max(0, Math.min(100, parseInt(pair.score) || 0)),
+                    strengths: Array.isArray(pair.strengths) ? pair.strengths : [],
+                    suggestions: Array.isArray(pair.suggestions) ? pair.suggestions : [],
+                    improved_answer: pair.improved_answer || ''
+                })) : [];
+
                 displayQAResults(analysis);
             } catch (err) {
                 console.error(err);
-                alert('Error analyzing Q&A.');
+                alert('Error analyzing Q&A: ' + err.message);
             } finally {
                 loading.classList.remove('show');
             }
@@ -8984,6 +9152,9 @@ Respond with JSON:
         window.loadCompanyPreset = loadCompanyPreset;
         window.saveCompanySettings = saveCompanySettings;
         window.resetCompanySettings = resetCompanySettings;
+        window.repopulateLPSelectors = repopulateLPSelectors;
+        window.getCompetencies = getCompetencies;
+        window.renderCompetenciesList = renderCompetenciesList;
 
         // Data Management
         window.exportAllData = exportAllData;
