@@ -3610,8 +3610,7 @@ CRITICAL INSTRUCTIONS:
                 result: '💎'
             };
             
-            const allLPs = ['Dive Deep', 'Ownership', 'Invent and Simplify', 'Learn and Be Curious', 
-                           'Deliver Results', 'Earn Trust', 'Have Backbone', 'Bias for Action'];
+            const allLPs = getCompetencies();
             
             const chips = node.detailChips || [];
             
@@ -6798,20 +6797,36 @@ Respond ONLY with valid JSON (no markdown, no backticks):
         async function generateQuestion(lp) {
             const questions = QUESTION_BANK[lp] || [];
             if (questions.length === 0) {
-                return "Tell me about a time you demonstrated " + lp;
+                // No pre-built questions for this competency — generate one via AI
+                if (hasApiKey()) {
+                    try {
+                        const data = await callClaudeAPI([{
+                            role: "user",
+                            content: `Generate ONE behavioral interview question for a ${CURRENT_COMPANY} interview that tests the competency "${lp}".
+The question should be specific, probing, and require a detailed STAR-format answer.
+Return ONLY the question text, nothing else.`
+                        }], 200);
+                        const generatedQ = data.content?.[0]?.text?.trim();
+                        if (generatedQ) return generatedQ;
+                    } catch (err) {
+                        console.error('Failed to generate question via AI:', err);
+                    }
+                }
+                // Final fallback if API call fails or no key
+                return `Tell me about a time at ${CURRENT_COMPANY} you demonstrated ${lp}`;
             }
-            
+
             // Check which questions from this LP haven't been practiced recently
             const history = await storage.load('practice_history') || {sessions: []};
             const recentQuestions = history.sessions
                 .filter(s => s.lp === lp)
                 .map(s => s.question)
                 .slice(-5); // Last 5 questions
-            
+
             // Prefer questions not recently practiced
             const unasked = questions.filter(q => !recentQuestions.includes(q));
             const pool = unasked.length > 0 ? unasked : questions;
-            
+
             return pool[Math.floor(Math.random() * pool.length)];
         }
 
@@ -6963,7 +6978,15 @@ Respond with JSON:
             }
 
             stopTimer();
-            
+
+            // Build dynamic competency example from current competencies
+            const competencies = getCompetencies();
+            const exampleLPs = competencies.slice(0, 2);
+            const lpDemoExample = exampleLPs.reduce((obj, lp) => {
+                obj[lp] = {"score": 8, "evidence": "..."};
+                return obj;
+            }, {});
+
             // Evaluate response
             try {
                 const evalResponse = await fetch("https://api.anthropic.com/v1/messages", {
@@ -6979,30 +7002,44 @@ Respond with JSON:
 QUESTION: ${currentDrill.question}
 RESPONSE: ${response}
 
+COMPETENCIES TO EVALUATE AGAINST: ${competencies.join(', ')}
+
 Respond with JSON:
 {
   "score": 85,
   "starStructure": {"situation": {"present": true, "feedback": "..."}},
-  "lpDemonstration": {"Dive Deep": {"score": 8, "evidence": "..."}},
+  "lpDemonstration": ${JSON.stringify(lpDemoExample)},
   "strengths": ["..."],
   "weaknesses": ["..."]
-}`
+}
+
+The "lpDemonstration" object should have keys from the competencies list above that the candidate demonstrated.`
                         }]
                     })
                 });
 
+                if (!evalResponse.ok) {
+                    const errBody = await evalResponse.json().catch(() => ({}));
+                    if (evalResponse.status === 401) throw new Error('Invalid API key. Please check your key in Settings.');
+                    if (evalResponse.status === 429) throw new Error('Rate limit exceeded. Please wait a minute and try again.');
+                    throw new Error(errBody.error?.message || `API error: ${evalResponse.status}`);
+                }
+
                 const data = await evalResponse.json();
+                if (!data.content || !data.content[0] || !data.content[0].text) {
+                    throw new Error('Unexpected API response format.');
+                }
                 const text = data.content[0].text.replace(/```json|```/g, "").trim();
                 const evaluation = JSON.parse(text);
-                
+
                 displayDrillEvaluation(evaluation);
                 currentDrill.evaluation = evaluation;
                 currentDrill.response = response;
-                
+
                 document.getElementById('followup-section').style.display = 'block';
             } catch (err) {
                 console.error(err);
-                alert('Error evaluating response.');
+                alert('Error evaluating response: ' + (err.message || 'Unknown error'));
             }
         }
 
@@ -7586,9 +7623,7 @@ Respond ONLY with valid JSON (no markdown):
             const shouldPivot = currentDepthOnTopic >= 2;
             
             // LPs we haven't explored yet
-            const allLPs = ['Customer Obsession', 'Ownership', 'Invent and Simplify', 'Learn and Be Curious', 
-                           'Hire and Develop the Best', 'Insist on Highest Standards', 'Think Big', 'Bias for Action',
-                           'Frugality', 'Earn Trust', 'Dive Deep', 'Have Backbone', 'Deliver Results'];
+            const allLPs = getCompetencies();
             const exploredLPs = currentDrill.exploredLPs || [];
             const unexploredLPs = allLPs.filter(lp => !exploredLPs.includes(lp));
             
@@ -7601,7 +7636,7 @@ Respond ONLY with valid JSON (no markdown):
                         max_tokens: 500,
                         messages: [{
                             role: "user",
-                            content: `You are a BAR RAISING Amazon interviewer conducting a behavioral interview.
+                            content: `You are a rigorous ${CURRENT_COMPANY} interviewer conducting a behavioral interview.
 
 ORIGINAL QUESTION: ${currentDrill.question}
 CANDIDATE'S MAIN RESPONSE: ${currentDrill.response}
@@ -7611,15 +7646,16 @@ ${currentDrill.followUps.map((f, i) => `Q${i+1}: ${f.question}\nA${i+1}: ${f.res
 
 INTERVIEW DEPTH: ${followUpCount} follow-ups asked so far
 CURRENT TOPIC DEPTH: ${currentDepthOnTopic} questions on current thread
+COMPANY COMPETENCIES: ${allLPs.join(', ')}
 
 ${shouldPivot ? `
-⚠️ TIME TO PIVOT: You've gone 2 levels deep on this thread. 
+⚠️ TIME TO PIVOT: You've gone 2 levels deep on this thread.
 Now CHANGE DIRECTION to explore a DIFFERENT aspect of the story.
-Target one of these LPs not yet covered: ${unexploredLPs.slice(0, 3).join(', ')}
+Target one of these competencies not yet covered: ${unexploredLPs.slice(0, 3).join(', ')}
 
 Good pivots:
 - "Let's step back - tell me about [different stakeholder/challenge]"
-- "I want to understand [new LP area] - what about..."
+- "I want to understand [new competency area] - what about..."
 - "You mentioned X earlier, let's explore that instead"
 ` : `
 Keep diving into the current thread (${2 - currentDepthOnTopic} more deep questions allowed).
@@ -7628,17 +7664,27 @@ Look for: specifics, metrics, alternatives considered, who pushed back, what cou
 
 RULES:
 1. Ask about SPECIFIC details, not generalities
-2. Tie to a Leadership Principle when possible
+2. Tie to a ${CURRENT_COMPANY} competency when possible
 3. Look for: metrics, tradeoffs, stakeholder conflicts, what they'd do differently
 4. If they gave a weak answer, probe harder on that area
 5. One question only, be direct
 
-Generate ONE bar-raiser follow-up question:`
+Generate ONE rigorous follow-up question:`
                         }]
                     })
                 });
 
+                if (!response.ok) {
+                    const errBody = await response.json().catch(() => ({}));
+                    if (response.status === 401) throw new Error('Invalid API key. Please check your key in Settings.');
+                    if (response.status === 429) throw new Error('Rate limit exceeded. Please wait a minute and try again.');
+                    throw new Error(errBody.error?.message || `API error: ${response.status}`);
+                }
+
                 const data = await response.json();
+                if (!data.content || !data.content[0] || !data.content[0].text) {
+                    throw new Error('Unexpected API response format.');
+                }
                 const followUpQ = data.content[0].text.trim();
                 
                 // Update depth tracking
@@ -7674,7 +7720,8 @@ Generate ONE bar-raiser follow-up question:`
                 currentDrill.followUps.push({question: followUpQ, response: null});
                 
             } catch (err) {
-                console.error(err);
+                console.error('generateNextFollowUp error:', err);
+                alert('Error generating follow-up: ' + (err.message || 'Unknown error'));
             }
         }
 
@@ -7938,12 +7985,10 @@ Generate ONE bar-raiser follow-up question:`
             const shouldPivot = currentDepth >= 2 && candidateResponses > 0;
             
             // Track explored LPs - prioritize job's top LPs if available
-            const defaultLPs = ['Customer Obsession', 'Ownership', 'Invent and Simplify', 'Learn and Be Curious', 
-                           'Hire and Develop the Best', 'Insist on Highest Standards', 'Think Big', 'Bias for Action',
-                           'Frugality', 'Earn Trust', 'Dive Deep', 'Have Backbone', 'Deliver Results'];
+            const defaultLPs = getCompetencies();
             const priorityLPs = jobContext?.analysis?.top_lps || [];
             const allLPs = [...new Set([...priorityLPs, ...defaultLPs])];
-            
+
             window.simulatorExploredLPs = window.simulatorExploredLPs || [lp];
             const unexploredLPs = allLPs.filter(l => !window.simulatorExploredLPs.includes(l));
             
@@ -8067,8 +8112,7 @@ YOUR QUESTION:`
             const resumeContext = await getResumeContext();
             
             // Prioritize job's top LPs if available
-            const defaultLPs = ['Customer Obsession', 'Ownership', 'Invent and Simplify', 'Learn and Be Curious', 
-                           'Dive Deep', 'Have Backbone', 'Deliver Results', 'Earn Trust', 'Bias for Action'];
+            const defaultLPs = getCompetencies();
             const priorityLPs = jobContext?.analysis?.top_lps || [];
             const allLPs = [...new Set([...priorityLPs, ...defaultLPs])];
             
@@ -8551,8 +8595,10 @@ Respond ONLY with valid JSON (no markdown):
             }
 
             // Gather context for richer analysis
-            const resume = await storage.load('user_resume') || '';
-            const jobPosting = await storage.load('target_job') || '';
+            const rawResume = await storage.load('user_resume') || '';
+            const resume = typeof rawResume === 'string' ? rawResume : (rawResume?.text || rawResume?.content || '');
+            const rawJob = await storage.load('target_job') || '';
+            const jobPosting = typeof rawJob === 'string' ? rawJob : (rawJob?.description || rawJob?.text || '');
             const competenciesList = CURRENT_COMPETENCIES.join(', ');
 
             try {
@@ -8573,7 +8619,7 @@ EVALUATION FRAMEWORK:
 - Strengths should cite specific parts of the answer that work well
 - Suggestions should be actionable (e.g., "Add a specific metric for the outcome" not "Be more specific")
 - Improved answers should demonstrate STAR structure and include concrete details
-${resume ? `\nCANDIDATE RESUME (for context):\n${typeof resume === 'string' ? resume.substring(0, 1000) : ''}\n` : ''}${jobPosting ? `\nTARGET ROLE:\n${typeof jobPosting === 'object' ? (jobPosting.title || '') + ' ' + (jobPosting.description || '').substring(0, 500) : String(jobPosting).substring(0, 500)}\n` : ''}
+${resume ? `\nCANDIDATE RESUME (for context):\n${resume.substring(0, 1000)}\n` : ''}${jobPosting ? `\nTARGET ROLE:\n${jobPosting.substring(0, 500)}\n` : ''}
 Q&A PAIRS:
 ${qaText}
 
@@ -8989,6 +9035,11 @@ Respond ONLY with valid JSON (no markdown, no backticks):
         const spacedRepetition = new SpacedRepetitionManager();
 
         async function loadFromQueue() {
+            if (!hasApiKey()) {
+                alert('API key required to practice from the review queue. Go to Settings to add your Anthropic API key.');
+                return;
+            }
+
             const dueQuestions = await spacedRepetition.getQueuedQuestions();
             
             if (dueQuestions.length === 0) {
