@@ -2,13 +2,81 @@
 
 Last updated: 2025-02-01
 
+## Prerequisites: API Key Setup
+
+Almost every feature in this app requires a Claude API key. Here's how to get one and where to put it.
+
+### Step 1: Get an Anthropic API Key
+
+1. Go to **https://console.anthropic.com/settings/keys**
+2. Log in (or create an account if you don't have one)
+3. Click **"Create Key"**
+4. Give it a name (e.g., "interview-coach-testing")
+5. Copy the key — it looks like: `sk-ant-api03-xxxxxxxxxxxx...`
+6. **Important:** You need credits on your account. Check your balance at https://console.anthropic.com/settings/billing. Each test costs roughly $0.01–$0.10 per API call. Full test run ≈ $1–3.
+
+### Step 2: Insert the API Key into the App
+
+**Option A — On first launch (BYOK modal):**
+1. Open `behavioral-interview-coach.html` in your browser
+2. A modal popup appears: "Enter your Anthropic API Key"
+3. Paste your `sk-ant-api03-...` key into the input field
+4. Click **"Save Key"**
+5. The modal closes — you're ready to test
+
+**Option B — Via Settings (if you skipped the modal):**
+1. Open the app → click the **Settings** tab (⚙️ gear icon, last tab)
+2. Find the **"API Configuration"** section at the top
+3. Paste your key into the password input field
+4. Click **"Save API Key"**
+5. A success message confirms the key is saved
+
+**Option C — Via browser DevTools (manual):**
+1. Open DevTools (F12 or Cmd+Option+I)
+2. Go to Console tab
+3. Run: `localStorage.setItem('anthropic_api_key', 'sk-ant-api03-YOUR_KEY_HERE')`
+4. Refresh the page
+
+### Where the Key is Stored
+
+- The key lives in your browser's `localStorage` under the key `anthropic_api_key`
+- It is **never** sent anywhere except `https://api.anthropic.com/v1/messages`
+- To verify: DevTools → Application → Local Storage → look for `anthropic_api_key`
+- To remove: Settings → "Clear API Key", or `localStorage.removeItem('anthropic_api_key')` in console
+
+### Which Features Need the Key vs. Don't
+
+| Needs API Key | Works Without Key |
+|---------------|-------------------|
+| Story Analyzer (Analyze tab) | Story Web viewing/editing |
+| Practice Mode (all drills) | Timeline visualization |
+| Interview Simulator | Data export/import |
+| Q&A Review | Settings (company, export) |
+| Competency Map | Story Manager |
+| Company Research | Guide tab |
+| AI node suggestions | Manual node/chip editing |
+
+### API Cost Estimates Per Test Section
+
+| Section | Approx. API Calls | Approx. Cost |
+|---------|-------------------|--------------|
+| B3: Story Analyzer | 1-2 | $0.05–$0.10 |
+| B6: Practice Mode | 3-5 | $0.10–$0.20 |
+| B7: Interview Simulator | 3-6 | $0.10–$0.25 |
+| B8: Q&A Review | 1-2 | $0.05–$0.10 |
+| B9: Competency Map | 1 | $0.05–$0.10 |
+| B10: Company Research | 1 | $0.05–$0.10 |
+| **Total full run** | **~15-20** | **$0.50–$1.00** |
+
+---
+
 ## How to Use This Plan
 
 1. Open `behavioral-interview-coach.html` in Chrome/Firefox
-2. Work through each section in order — earlier tests set up data for later ones
-3. Mark each checkbox as you go: `[x]` = PASS, `[ ]` = not tested, `[FAIL]` = broken
-4. **Estimated total time:** You decide — the plan is ordered so you can stop at any section boundary
-5. **API key required** for most tests. Have your Anthropic API key ready.
+2. **Set up your API key first** (see Prerequisites above)
+3. Work through each section in order — earlier tests set up data for later ones
+4. Mark each checkbox as you go: `[x]` = PASS, `[ ]` = not tested, `[FAIL]` = broken
+5. You can stop at any section boundary — the plan is ordered by priority
 
 ---
 
