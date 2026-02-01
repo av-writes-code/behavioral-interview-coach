@@ -1351,11 +1351,10 @@ Key things to include:
                 <div id="timeline-container" style="display: none;">
                     <!-- Color Legend -->
                     <div style="background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin: 20px 0; display: flex; flex-wrap: wrap; gap: 20px; align-items: center;">
-                        <span style="font-weight: bold; color: #333;">STAR Components:</span>
-                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #A8D5BA;"></div><span>Situation</span></div>
-                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #AED9E0;"></div><span>Task</span></div>
-                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #FFD9A8;"></div><span>Action</span></div>
-                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #F4B4D4;"></div><span>Result</span></div>
+                        <span style="font-weight: bold; color: #333;">Chart Colors:</span>
+                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #ff3333;"></div><span>Situation (crit)</span></div>
+                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #4682b4;"></div><span>Task / Action (default)</span></div>
+                        <div style="display: flex; align-items: center; gap: 8px;"><div style="width: 20px; height: 14px; border-radius: 3px; background: #6b8e23;"></div><span>Result (done)</span></div>
                     </div>
 
                     <!-- Mermaid Timeline -->
@@ -1585,6 +1584,37 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
 
         function hasApiKey() {
             return !!getApiKey();
+        }
+
+        function getCompetencyColor(name) {
+            // Deterministic hash-based color for any competency name
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = name.charCodeAt(i) + ((hash << 5) - hash);
+                hash = hash & hash; // Convert to 32-bit integer
+            }
+            // Generate hue from hash, keep saturation/lightness in readable range
+            const hue = Math.abs(hash) % 360;
+            const saturation = 55 + (Math.abs(hash >> 8) % 20); // 55-75%
+            const lightness = 40 + (Math.abs(hash >> 16) % 15); // 40-55%
+            // Convert HSL to hex
+            const h = hue / 360;
+            const s = saturation / 100;
+            const l = lightness / 100;
+            const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            };
+            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            const p = 2 * l - q;
+            const r = Math.round(hue2rgb(p, q, h + 1/3) * 255);
+            const g = Math.round(hue2rgb(p, q, h) * 255);
+            const b = Math.round(hue2rgb(p, q, h - 1/3) * 255);
+            return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
         }
 
         function showApiKeyModal() {
@@ -1905,11 +1935,11 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
                 starOrder.indexOf(a.starComponent) - starOrder.indexOf(b.starComponent)
             );
 
-            // Generate Mermaid Gantt syntax
+            // Generate Mermaid Gantt syntax using relative durations (after syntax)
             let mermaidCode = `gantt
     title ${story.title || 'Story Timeline'}
-    dateFormat YYYY-MM-DD
-    axisFormat Day %e
+    dateFormat X
+    axisFormat Step %s
 `;
 
             // Group by STAR component
@@ -1920,13 +1950,14 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
                 }
             });
 
-            let dayCounter = 1;
+            let stepCounter = 0;
             const sectionNames = {
                 situation: 'SITUATION',
                 task: 'TASK',
                 action: 'ACTION',
                 result: 'RESULT'
             };
+            let prevId = null;
 
             Object.keys(byComponent).forEach(component => {
                 const componentNodes = byComponent[component];
@@ -1937,10 +1968,16 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
                 componentNodes.forEach((node, idx) => {
                     const title = (node.eventTitle || 'Event').replace(/:/g, ' ').substring(0, 40);
                     const duration = component === 'action' ? 2 : 1;
-                    const style = component === 'result' ? 'done, ' : (component === 'situation' ? 'crit, ' : '');
+                    const style = component === 'situation' ? 'crit, ' : (component === 'result' ? 'done, ' : '');
+                    const nodeId = `node${stepCounter}`;
 
-                    mermaidCode += `    ${title} :${style}node${dayCounter}, 2000-01-${String(dayCounter).padStart(2, '0')}, ${duration}d\n`;
-                    dayCounter += duration;
+                    if (prevId) {
+                        mermaidCode += `    ${title} :${style}${nodeId}, after ${prevId}, ${duration}d\n`;
+                    } else {
+                        mermaidCode += `    ${title} :${style}${nodeId}, 0, ${duration}d\n`;
+                    }
+                    prevId = nodeId;
+                    stepCounter += duration;
                 });
             });
 
@@ -2031,7 +2068,9 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
                 user_resume: await storage.load('user_resume') || null,
                 target_job: await storage.load('target_job') || null,
                 company_settings: await storage.load('company_settings') || null,
-                preferences: await storage.load('preferences') || {}
+                preferences: await storage.load('preferences') || {},
+                saved_research: await storage.load('saved_research') || null,
+                review_queue: await storage.load('review_queue') || null
             };
 
             const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
@@ -2070,6 +2109,8 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
                 if (data.target_job) await storage.save('target_job', data.target_job);
                 if (data.company_settings) await storage.save('company_settings', data.company_settings);
                 if (data.preferences) await storage.save('preferences', data.preferences);
+                if (data.saved_research) await storage.save('saved_research', data.saved_research);
+                if (data.review_queue) await storage.save('review_queue', data.review_queue);
 
                 alert('Data imported successfully! Reloading...');
                 window.location.reload();
@@ -6722,7 +6763,7 @@ Respond ONLY with valid JSON (no markdown, no backticks):
             const lps = Object.keys(analysis.coverage_matrix);
             
             let gridHTML = `
-                <div class="heatmap-cell heatmap-label">Leadership Principle</div>
+                <div class="heatmap-cell heatmap-label">Competency</div>
                 ${Array.from({length: storyCount}, (_, i) => `
                     <div class="heatmap-cell heatmap-header">Story ${i+1}</div>
                 `).join('')}
@@ -6740,12 +6781,12 @@ Respond ONLY with valid JSON (no markdown, no backticks):
 
             results.innerHTML = `
                 <div class="heatmap-container">
-                    <h2>LP Coverage Heat Map</h2>
+                    <h2>Competency Coverage Heat Map</h2>
                     <p>MECE Score: ${analysis.mece_score}/10</p>
                     <div class="heatmap-grid">${gridHTML}</div>
                 </div>
                 <div class="guide-section">
-                    <h3>✅ Strongest LPs</h3>
+                    <h3>✅ Strongest Competencies</h3>
                     <ul>${analysis.strongest.map(lp => `<li>${lp}</li>`).join('')}</ul>
                 </div>
                 <div class="highlight-box">
@@ -8667,6 +8708,7 @@ Respond ONLY with valid JSON (no markdown, no backticks):
                     question: pair.question || 'Unknown question',
                     answer: pair.answer || 'No answer provided',
                     score: Math.max(0, Math.min(100, parseInt(pair.score) || 0)),
+                    competencies_demonstrated: Array.isArray(pair.competencies_demonstrated) ? pair.competencies_demonstrated : [],
                     strengths: Array.isArray(pair.strengths) ? pair.strengths : [],
                     suggestions: Array.isArray(pair.suggestions) ? pair.suggestions : [],
                     improved_answer: pair.improved_answer || ''
@@ -8696,6 +8738,11 @@ Respond ONLY with valid JSON (no markdown, no backticks):
                         <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0;">
                             <strong>Your A:</strong> ${pair.answer}
                         </div>
+                        ${pair.competencies_demonstrated && pair.competencies_demonstrated.length > 0 ? `
+                            <div style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 6px;">
+                                ${pair.competencies_demonstrated.map(c => `<span style="background: ${getCompetencyColor(c)}; color: white; padding: 3px 10px; border-radius: 12px; font-size: 0.8em; font-weight: 500;">${c}</span>`).join('')}
+                            </div>
+                        ` : ''}
                         <div class="feedback-section">
                             <h4>Score: ${pair.score}/100</h4>
                             <h4>✅ Strengths</h4>
@@ -9205,6 +9252,7 @@ Respond ONLY with valid JSON (no markdown, no backticks):
         window.resetCompanySettings = resetCompanySettings;
         window.repopulateLPSelectors = repopulateLPSelectors;
         window.getCompetencies = getCompetencies;
+        window.getCompetencyColor = getCompetencyColor;
         window.renderCompetenciesList = renderCompetenciesList;
 
         // Data Management
