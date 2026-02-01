@@ -1408,6 +1408,10 @@ Key things to include:
                 </div>
 
                 <div id="research-results" style="display: none;">
+                    <!-- AI Disclaimer -->
+                    <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; color: #856404;">
+                        <strong>⚠️ Disclaimer:</strong> AI-generated information based on training data. May be outdated or inaccurate — verify independently.
+                    </div>
                     <!-- Interview Process -->
                     <div class="input-section" style="border-left: 4px solid #11998e;">
                         <h3>📋 Interview Process</h3>
@@ -6769,6 +6773,15 @@ Respond ONLY with valid JSON (no markdown, no backticks):
                 analysis.gaps = Array.isArray(analysis.gaps) ? analysis.gaps : [];
                 analysis.strongest = Array.isArray(analysis.strongest) ? analysis.strongest : [];
                 analysis.mece_score = Math.max(0, Math.min(10, parseInt(analysis.mece_score) || 0));
+
+                // Filter coverage_matrix to only include valid CURRENT_COMPETENCIES
+                const validCompetencies = new Set(CURRENT_COMPETENCIES);
+                const matrixKeys = Object.keys(analysis.coverage_matrix);
+                const removedKeys = matrixKeys.filter(k => !validCompetencies.has(k));
+                if (removedKeys.length > 0) {
+                    console.warn('Removed hallucinated competencies from coverage_matrix:', removedKeys);
+                    removedKeys.forEach(k => delete analysis.coverage_matrix[k]);
+                }
 
                 displayCoverageMap(analysis, stories.length);
             } catch (error) {
