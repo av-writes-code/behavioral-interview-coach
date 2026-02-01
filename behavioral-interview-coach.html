@@ -860,7 +860,7 @@ Key things to include:
                 <div class="input-section">
                     <h3>Your Story</h3>
                     <textarea id="story-input" placeholder="Paste your complete story here..."></textarea>
-                    <button class="btn btn-primary" onclick="analyzeStory()">🔍 Analyze Story Depth</button>
+                    <button id="analyze-btn" class="btn btn-primary" onclick="analyzeStory()">🔍 Analyze Story Depth</button>
                     <button class="btn btn-secondary" onclick="clearStoryAnalyzer()">Clear</button>
                 </div>
 
@@ -1586,6 +1586,16 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
             return !!getApiKey();
         }
 
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         function getCompetencyColor(name) {
             // Deterministic hash-based color for any competency name
             let hash = 0;
@@ -2099,6 +2109,12 @@ Collaboration" style="width: 100%; padding: 12px; border: 2px solid #ddd; border
                     return;
                 }
 
+                if (data.version !== APP_VERSION) {
+                    if (!confirm(`This backup is version ${data.version} but app is version ${APP_VERSION}. Import anyway?`)) {
+                        return;
+                    }
+                }
+
                 if (!confirm('This will replace all your current data. Continue?')) {
                     return;
                 }
@@ -2516,8 +2532,6 @@ Success Profile: ${currentResearchData.mental_model?.success_profile || 'N/A'}
         let audioBlob = null;
         let timerInterval = null;
         let currentTimerSeconds = 0;
-        let starTimings = {situation: 0, task: 0, action: 0, result: 0};
-        let currentComponent = 'situation';
 
         // ==================== STORAGE MANAGER ====================
         class StorageManager {
@@ -3133,6 +3147,7 @@ Respond ONLY with valid JSON:
                 return;
             }
 
+            document.getElementById('analyze-btn').disabled = true;
             currentStory = story;
             const loading = document.getElementById('story-loading');
             const results = document.getElementById('story-results');
@@ -3269,6 +3284,7 @@ CRITICAL INSTRUCTIONS:
                 alert('Error analyzing story. Check console for details.');
             } finally {
                 loading.classList.remove('show');
+                document.getElementById('analyze-btn').disabled = false;
             }
         }
 
@@ -3279,11 +3295,11 @@ CRITICAL INSTRUCTIONS:
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <h3>Story Depth Analysis</h3>
                         <span style="background: var(--color-success); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.85em;">
-                            ✅ Saved: "${analysis.title}"
+                            ✅ Saved: "${escapeHTML(analysis.title)}"
                         </span>
                     </div>
                     <div class="score-display">${analysis.meatiness_score}/10</div>
-                    <p>${analysis.overall_feedback}</p>
+                    <p>${escapeHTML(analysis.overall_feedback)}</p>
                     <div class="dashboard-grid">
                         <div class="stat-card">
                             <div class="stat-value">${analysis.depth_indicators.metrics_count}</div>
@@ -6680,6 +6696,11 @@ Create 4-8 nodes covering Situation, Task, Actions, and Results.`
                 return;
             }
 
+            if (CURRENT_COMPETENCIES.length === 0) {
+                alert('No competencies configured. Go to Settings to configure competencies for your target company.');
+                return;
+            }
+
             const loading = document.getElementById('coverage-loading');
             const results = document.getElementById('coverage-results');
 
@@ -6831,7 +6852,6 @@ Respond ONLY with valid JSON (no markdown, no backticks):
             document.getElementById('followup-section').style.display = 'none';
             document.getElementById('followup-container').innerHTML = '';
             document.getElementById('drill-response').value = '';
-            starTimings = {situation: 0, task: 0, action: 0, result: 0};
             currentTimerSeconds = 0;
         }
 
@@ -7002,13 +7022,6 @@ Respond with JSON:
                 timerInterval = null;
                 document.getElementById('main-timer').classList.remove('running');
             }
-        }
-
-        function updateSTARDisplay() {
-            document.getElementById('timer-s').textContent = starTimings.situation + 's';
-            document.getElementById('timer-t').textContent = starTimings.task + 's';
-            document.getElementById('timer-a').textContent = starTimings.action + 's';
-            document.getElementById('timer-r').textContent = starTimings.result + 's';
         }
 
         async function submitDrillResponse() {
@@ -7940,7 +7953,6 @@ Generate ONE rigorous follow-up question:`
             document.getElementById('drill-response').value = '';
             currentDrill = null;
             currentTimerSeconds = 0;
-            starTimings = {situation: 0, task: 0, action: 0, result: 0};
             audioBlob = null;
         }
 
@@ -8635,6 +8647,12 @@ Respond ONLY with valid JSON (no markdown):
                 return;
             }
 
+            if (CURRENT_COMPETENCIES.length === 0) {
+                alert('No competencies configured. Go to Settings to configure competencies for your target company.');
+                loading.classList.remove('show');
+                return;
+            }
+
             // Gather context for richer analysis
             const rawResume = await storage.load('user_resume') || '';
             const resume = typeof rawResume === 'string' ? rawResume : (rawResume?.text || rawResume?.content || '');
@@ -8733,10 +8751,10 @@ Respond ONLY with valid JSON (no markdown, no backticks):
                     <div class="evaluation-card">
                         <h3>Q&A Pair ${i + 1}</h3>
                         <div style="background: #e7e3ff; padding: 15px; border-radius: 8px; margin: 10px 0;">
-                            <strong>Q:</strong> ${pair.question}
+                            <strong>Q:</strong> ${escapeHTML(pair.question)}
                         </div>
                         <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0;">
-                            <strong>Your A:</strong> ${pair.answer}
+                            <strong>Your A:</strong> ${escapeHTML(pair.answer)}
                         </div>
                         ${pair.competencies_demonstrated && pair.competencies_demonstrated.length > 0 ? `
                             <div style="margin: 10px 0; display: flex; flex-wrap: wrap; gap: 6px;">
@@ -8753,7 +8771,7 @@ Respond ONLY with valid JSON (no markdown, no backticks):
                         ${pair.improved_answer ? `
                             <div class="highlight-box">
                                 <strong>✨ Improved Version:</strong><br>
-                                ${pair.improved_answer}
+                                ${escapeHTML(pair.improved_answer)}
                             </div>
                         ` : ''}
                     </div>
@@ -9253,6 +9271,7 @@ Respond ONLY with valid JSON (no markdown, no backticks):
         window.repopulateLPSelectors = repopulateLPSelectors;
         window.getCompetencies = getCompetencies;
         window.getCompetencyColor = getCompetencyColor;
+        window.escapeHTML = escapeHTML;
         window.renderCompetenciesList = renderCompetenciesList;
 
         // Data Management
