@@ -1,117 +1,180 @@
 # Behavioral Interview Coach
 
-A comprehensive, AI-powered interview preparation tool for behavioral interviews. Built as a single HTML file with no backend required.
+A comprehensive, AI-powered interview preparation tool for behavioral interviews. Built as a single HTML file — no server, no install, no dependencies. Just open it in a browser.
 
-## Features
+## Getting Started
 
-### Core Capabilities
-- **Story Analyzer**: Evaluate if your story has sufficient depth for rigorous follow-up questions, with AI scoring and feedback
-- **Story Web Builder**: Build stories with STAR components (Situation, Task, Action, Result) displayed as organized card views
-- **Timeline View**: Visualize your stories as Mermaid Gantt charts showing sequential flow of events
-- **Practice Mode**: Practice sessions with a 60-second target timer and AI-generated follow-up questions
-- **Q&A Review**: Analyze your question-answer pairs against competency frameworks for strengths and improvements
-- **Competency Map**: AI-analyzed coverage heatmap of competencies across your stories
-- **Company Research**: Research company interview processes using Claude's knowledge base
+### 1. Open the App
 
-### AI-Powered Features
-- Story depth analysis and scoring (0-10 scale)
-- Dynamic follow-up question generation based on your responses
-- Probing questions informed by interview best practices
-- Suggested response improvements with STAR framework evaluation
-- Company interview research (uses Claude's training knowledge, not live web search)
+```
+# That's it. Just open the file in your browser:
+open behavioral-interview-coach.html
 
-### Bring Your Own Key (BYOK)
-This app uses the Claude API for AI features. You'll need your own Anthropic API key:
-1. Get a key from [Anthropic Console](https://console.anthropic.com/settings/keys)
-2. Enter it when prompted on first load, or go to Settings
-3. Your key is stored locally in your browser - never sent anywhere except Anthropic's API
-4. Non-AI features (Story Web, Timeline) work without an API key
+# Or double-click the file in Finder/Explorer
+# Or drag it into Chrome/Firefox/Safari/Edge
+```
 
-### Company-Agnostic
-Supports multiple company competency frameworks:
-- Amazon Leadership Principles
-- Google Googleyness
-- Meta Core Values
-- Microsoft Growth Mindset
-- Custom competencies for any company
+No `npm install`. No `docker run`. No backend. It's one HTML file.
 
-Changing the company in Settings updates competency options across all tabs.
+### 2. Add Your API Key
 
-## Quick Start
+The app uses Claude (Anthropic) for AI features. You need your own API key:
 
-1. Open `behavioral-interview-coach.html` in any modern browser
-2. Enter your Anthropic API key when prompted (or skip for limited mode)
-3. (Optional) Go to Settings to select your target company
-4. Start building your stories!
+1. Go to [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys)
+2. Create a new key (name it anything, e.g., "interview-coach")
+3. Copy the key — it starts with `sk-ant-api03-...`
+4. Paste it into the modal that appears when you first open the app
+5. Alternatively: go to **Settings** tab and paste it under "API Configuration"
+
+**Cost:** Each AI call costs ~$0.01–$0.10. A full practice session is roughly $0.10–$0.30. Your key is stored in your browser's localStorage only — never sent anywhere except `api.anthropic.com`.
+
+**No key?** Story Web viewing/editing, Timeline, data export/import, and Settings all work without an API key.
+
+### 3. Pick Your Company
+
+Go to **Settings** and select your target company:
+
+| Preset | Competencies |
+|--------|-------------|
+| **Amazon** | 14 Leadership Principles (Customer Obsession, Ownership, etc.) |
+| **Google** | 7 competencies (Googleyness, General Cognitive Ability, etc.) |
+| **Meta** | 5 core values (Move Fast, Be Bold, etc.) |
+| **Microsoft** | 5 competencies (Growth Mindset, Customer Obsession, etc.) |
+| **Custom** | Enter any company name + your own competency list |
+
+This choice propagates everywhere — practice questions, evaluations, competency maps, all of it.
+
+### 4. Start Prepping
+
+See the tab-by-tab guide below.
+
+---
+
+## Features (Tab by Tab)
+
+### Analyze — Story Depth Analyzer
+
+Paste a behavioral interview story and get an AI score (0–10) on how "meaty" it is. The AI evaluates:
+- Metrics and data points
+- Technical depth
+- Cross-functional impact
+- Follow-up question potential
+
+The story auto-saves and generates a Story Web structure for the next tab.
+
+**Also here:** Save your resume and target job posting for personalized AI feedback across all tabs.
+
+### Story Web — STAR Component Builder
+
+Visual card-based view of your story broken into Situation, Task, Action, Result events. Each node has:
+- Dimensions (Problem, Solution, Alternatives, Metrics, Tradeoffs)
+- Memory anchors (emoji + keyword for recall)
+- Detail chips (Difficulty, Stakeholder, Metric, Insight, Follow-up)
+- Competency tags
+
+Toggle between **Review Mode** (all visible) and **Practice Mode** (details hidden, click to reveal — for memory training).
+
+**Export:** JSON, Markdown, or standalone interactive HTML.
+
+### Timeline — Gantt Chart View
+
+Select a story to see a Mermaid Gantt chart with STAR phases laid out sequentially. Color-coded: red = Situation, blue = Task/Action, green = Result.
+
+### Practice — Question Drill
+
+1. Pick competencies to practice
+2. AI generates a behavioral question (from a question bank, or AI-generated for non-Amazon companies)
+3. 60-second target timer with warnings
+4. Submit your response for AI evaluation (score, strengths, weaknesses)
+5. AI generates bar-raiser-style follow-up questions (depth tracking + pivot logic)
+6. Sessions save to history; low-scoring questions go into a spaced repetition review queue
+
+### Simulator — Full Interview Simulation
+
+Two modes:
+- **Story mode:** Paste a story, get interviewed about it with realistic follow-ups
+- **LP mode:** Pick a competency, get cold-started with a behavioral question
+
+The AI acts as a rigorous interviewer — pivots between competencies, probes for specifics, challenges weak answers.
+
+### Q&A Review — Batch Answer Analyzer
+
+Paste multiple Q&A pairs (`Q: ... A: ...` format) and get:
+- Per-pair scores with strengths and suggestions
+- Competency tags (colored badges showing which competencies each answer demonstrates)
+- Improved STAR-structured answer for each pair
+
+### Competency Map — Coverage Heatmap
+
+Paste 2+ stories separated by `---` and get a heatmap showing which competencies each story covers, gaps in your coverage, and a MECE score.
+
+### Guide — Quick Reference
+
+Static reference card with STAR framework reminders. If you've saved a job posting, shows job-specific tips (top competencies to focus on, key skills).
+
+### Research — Company Interview Research
+
+Enter a company + role and get AI-generated research on:
+- Interview process and format
+- Key competencies/values they look for
+- Common behavioral questions
+- Preparation tips
+
+Results come from Claude's training data (not live web search) — a disclaimer warns about potential inaccuracies.
+
+### Settings
+
+- **API Key:** Save, update, or clear your Anthropic API key
+- **Company:** Select preset or define custom competencies
+- **Data:** Export all data as JSON backup, import from backup, or clear everything
+
+---
+
+## Data & Privacy
+
+All data lives in your browser's `localStorage`. Nothing is sent to any server except Anthropic's API for AI features.
+
+**What's stored:**
+- Stories and nodes
+- Practice history and review queue
+- Resume and job posting
+- Company settings and preferences
+- Saved research results
+- API key
+
+**Backup your data:** Settings → Export All Data → saves a JSON file. Import it on another browser/machine via Settings → Import.
+
+---
 
 ## Project Structure
 
 ```
 behavioral-interview-coach/
-├── behavioral-interview-coach.html  # Main app (open this)
+├── behavioral-interview-coach.html  # The entire app (open this)
 ├── README.md                        # This file
+├── ACCEPTANCE_CRITERIA.md           # 18 fix criteria from v3.2 audit
+├── TESTING_PLAN.md                  # Manual E2E testing plan
 ├── LICENSE                          # MIT License
 └── .gitignore                       # Git ignore patterns
 ```
 
-## Usage
-
-### Building a Story
-1. Go to **Analyze** tab to evaluate your story's depth
-2. Use **Story Web** to break your story into STAR components
-3. Add detailed dimensions: Problem, Solution, Alternatives, Metrics, Tradeoffs
-4. Tag each event with relevant competencies from your selected company
-
-### Practice Mode
-1. Select competencies in the **Practice** tab (story selection is optional)
-2. Start a practice session with a 60-second target timer
-3. Practice answering follow-up questions
-4. Get AI feedback on your responses
-
-### Timeline Visualization
-1. Build your story in Story Web first
-2. Go to **Timeline** tab
-3. Select your story to see a Gantt chart showing the sequential flow of events
-
-### Settings
-- **API Key**: Manage your Anthropic API key
-- **Company**: Select target company or define custom competencies
-- **Data**: Export/import backups, clear all data
-
-## Data Storage
-
-All data is stored locally in your browser using localStorage:
-- Stories and nodes
-- Practice history
-- Resume and job posting
-- API key
-- Company settings
-
-Use the **Settings** tab to export/import data backups.
-
 ## Technical Details
 
-- Single HTML file (~460KB)
-- No server required
-- Uses Claude API (claude-sonnet-4-5-20250929)
-- Mermaid.js v10.9.1 for timeline charts (loaded from CDN)
-- LocalStorage for persistence
-- API calls include retry logic with exponential backoff for rate limits
-
-## Privacy
-
-- Your API key is stored only in your browser's localStorage
-- No data is sent to any server except Anthropic's API for AI features
-- All stories and practice data remain local
+- Single HTML file (~470KB) — all HTML, CSS, and JavaScript inline
+- No server, no build step, no dependencies to install
+- Uses Claude API (`claude-sonnet-4-5-20250929`) via direct browser fetch
+- Mermaid.js v10.9.1 loaded from CDN for Gantt charts
+- API calls include 120s timeout, retry with exponential backoff for 429/500 errors
+- XSS protection via `escapeHTML()` on AI response fields
 
 ## Browser Support
 
-Works in modern browsers (Chrome, Firefox, Safari, Edge). Requires JavaScript enabled and internet connection for CDN resources and API calls.
+Chrome, Firefox, Safari, Edge — any modern browser with JavaScript enabled. Requires internet for API calls and Mermaid CDN.
 
 ## License
 
-[MIT License](LICENSE) - Feel free to modify and use for your interview prep.
+[MIT License](LICENSE)
 
 ---
 
-*Version 3.1*
+*Version 3.2*
